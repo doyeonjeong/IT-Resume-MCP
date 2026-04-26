@@ -1,0 +1,35 @@
+# Nestjs specific
+/dist
+/node_modules
+/build
+/tmp
+.DS_Store
+
+# Logs
+logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# dotenv environment variable files
+.env
+.env.development
+.env.test
+.env.production
+
+# temp directory
+.temp
+.tmp
+
+# Project-specific private data
+public-resume-mcp/data/profile.json
+public-resume-mcp/documents/
+
+# Local agent state (oh-my-claudecode + Claude Code)
+.omc/
+.claude/
+public-resume-mcp/.omc/
+public-resume-mcp/.claude/
