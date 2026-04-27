@@ -236,6 +236,161 @@ npm run mcp
 3. 빠른 1회 생성이 필요하면 `generate_resume`
 4. 단계형 제어가 필요하면 `analyze_jd -> match_profile_to_jd -> generate_resume_bullets -> generate_resume_markdown`
 
+## 사용법 시나리오 (Workflow Walkthrough)
+
+이 MCP 서버는 Cursor / Claude Code / Cline 같은 AI IDE에서 도구를 호출하는 방식으로 사용합니다. AI가 도구 이름과 인자를 자동으로 결정하므로, 사용자는 자연어로 의도만 전달하면 됩니다.
+
+### 시나리오 1 — JD 받았을 때 한 번에 이력서 생성
+
+채팅에 채용 공고 텍스트를 붙여넣고 한 줄 요청합니다.
+
+> "이 JD에 맞춰 이력서 만들어줘. 회사명은 ROSAIC. 직무는 LLM 엔지니어."
+
+AI는 자동으로 다음을 호출합니다:
+
+```
+generate_resume({
+  position: "LLM 엔지니어",
+  companyName: "ROSAIC",
+  jdText: "<JD 본문 전체>",
+  language: "ko"
+})
+```
+
+**동작 경로:** Cloud LLM (`LLM_PROVIDER` 설정된 provider — Claude/OpenAI/Gemini fallback) 한 번 호출 → 완성된 이력서 markdown 반환.
+
+**언제 쓰나:** 빠른 1회 생성. JD가 짧고 단순할 때.
+
+### 시나리오 2 — 단계별 제어로 정밀 이력서 생성 (권장)
+
+세부 제어가 필요하면 4단계 stepwise 파이프라인:
+
+#### Step 1: JD 분석
+
+> "이 JD부터 분석해줘"
+
+```
+analyze_jd({ jdText: "<JD 본문>", language: "ko" })
+```
+
+응답 (구조화 JSON):
+```json
+{
+  "roleTitle": "AI x Robotics x Manufacturing AX 엔지니어",
+  "companyType": "startup",
+  "requiredSkills": ["Python", "Git", "Linux", ...],
+  "preferredSkills": ["ROS2", "Isaac Sim", "LLM", ...],
+  "responsibilities": ["LLM 기반 제조 AX 솔루션 개발", ...],
+  "keywords": ["AI", "Robotics", "Manufacturing AX", ...],
+  "seniority": "mid",
+  "atsKeywords": ["Python", "LLM", "RAG", ...],
+  "riskFactors": ["주니어에게 진입 장벽이 높음", ...]
+}
+```
+
+#### Step 2: 프로필과 매칭
+
+> "그 분석 결과로 내 프로필이랑 매칭해봐"
+
+```
+match_profile_to_jd({ jdAnalysis: <step1 결과>, language: "ko" })
+```
+
+응답:
+```json
+{
+  "strongMatches": ["LLM API (Claude, OpenAI, Gemini) 직접 운영 경험"],
+  "partialMatches": ["NestJS 백엔드 경험은 풍부하나 Python AI 시스템 개발 경험은 부족"],
+  "missingButRecoverable": ["ROS2/Isaac Sim 경험 없음 — 학습 중임을 명시"],
+  "doNotOverclaim": ["로보틱스 도메인 실무 경험"],
+  "recommendedPositioning": "AI Agent 설계 경험을 제조 AX 영역으로 확장하는 엔지니어"
+}
+```
+
+#### Step 3: ATS 친화 bullet 생성
+
+> "이걸로 이력서 bullet 뽑아줘"
+
+```
+generate_resume_bullets({ jdAnalysis: <step1>, language: "ko", tone: "professional" })
+```
+
+응답:
+```json
+{
+  "summary": "...",
+  "skills": ["Python", "LLM (Claude, OpenAI, Gemini)", ...],
+  "experienceBullets": ["...개선했습니다", ...],
+  "projectBullets": ["MCP 기반 AI Agent 서버 구축...", ...],
+  "coverLetterHooks": ["귀사의 ROSAIC 미션과 정확히 부합하는...", ...]
+}
+```
+
+#### Step 4: 최종 Markdown 이력서
+
+> "마크다운으로 정리해줘"
+
+```
+generate_resume_markdown({ resumeData: <step3>, template: "ai-agent" })
+```
+
+응답: 깨끗한 ATS-friendly markdown 이력서. `# 이름`으로 시작.
+
+**Template 선택:**
+- `general` — 표준
+- `ios`, `backend`, `fullstack`, `ai-agent` — 강조점에 따라 섹션 구성 변형
+
+### 시나리오 3 — 프로필 관리
+
+#### 첫 사용
+
+```
+get_profile()
+```
+
+`data/profile.json`이 없으면 `profile.example.json` 기준으로 자동 생성됩니다. 단 placeholder 값(`홍길동`, `프로젝트명`)이 남아있으면 모든 생성 도구가 `PROFILE_INCOMPLETE` 에러로 거부합니다.
+
+#### 부분 업데이트
+
+```
+update_profile({
+  skills: ["NestJS", "TypeScript", "Python", "MCP SDK", "Claude API"]
+})
+```
+
+지정한 필드만 갱신, 나머지는 유지.
+
+#### 직접 편집
+
+`data/profile.json`을 텍스트 에디터로 직접 편집해도 됩니다. JSON schema는 위 "프로필 스키마" 섹션 참고.
+
+### 시나리오 4 — 빠른 자기소개서 (1회 호출)
+
+> "이 JD로 ROSAIC 자기소개서 써줘"
+
+```
+generate_cover_letter({
+  position: "LLM 엔지니어",
+  companyName: "ROSAIC",
+  jdText: "<JD>",
+  language: "ko"
+})
+```
+
+Cloud LLM이 1,000자 이내 한국어 자기소개서를 STAR 형식으로 작성합니다.
+
+### 실행 시간 참고 (Apple Silicon, Gemma 4 26B via Gemini OpenAI-compatible endpoint)
+
+| 단계 | 평균 |
+|---|---|
+| `analyze_jd` | 13초 |
+| `match_profile_to_jd` | 13초 |
+| `generate_resume_bullets` | 20초 |
+| `generate_resume_markdown` | 45초 |
+| **4단계 총합** | **약 90초** |
+
+`generate_resume`(1회 cloud) 경로는 약 10~20초 (provider 응답 속도에 따라).
+
 ## 프로필 스키마
 
 `data/profile.json`은 이 프로젝트의 단일 데이터 소스입니다.
