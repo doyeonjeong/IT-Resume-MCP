@@ -1,0 +1,170 @@
+<thought>*   Input: A job description for ROSAIC.
+    *   Output: A single, valid, parseable JSON object.
+    *   Schema: `roleTitle` (string, Korean), `companyType` (startup|enterprise|agency|unknown), `requiredSkills` (array of strings), `preferredSkills` (array), `responsibilities` (array, Korean), `keywords` (array), `seniority` (junior|mid|senior|unknown), `atsKeywords` (array), `riskFactors` (array, Korean).
+    *   Constraints: No comments, no extra text, double-quoted strings, single JSON object.
+
+    *   *Company:* ROSAIC (GenAI-Robotics manufacturing AX startup).
+    *   *Roles:*
+        1.  LLM-based Manufacturing AX Solution Developer (2 people).
+        2.  Robot Programming Developer (Assistant Manager/Manager level, 1 person).
+        3.  Manufacturing AX SI Programming & PM (Team Leader level, 1 person).
+        4.  Management Support (Manager level, 1 person).
+    *   *Company Type:* Startup.
+    *   *Required Skills:* Python, AI/SW/Robotics basics, Git, Python-based AI system development (FastAPI, Flask, asyncio), Linux, Docker, C++/Java/JavaScript (one or more).
+    *   *Preferred Skills:* ROS2, Isaac Sim, Unity, LLM, RAG, Prompt/Tool Calling, PLC/SCADA/OPC-UA, HRI, Vector DB (FAISS, Chroma, Pinecone), API design, WebSocket, Function Calling, MLOps/LLMOps, Problem definition to PoC experience.
+    *   *Responsibilities (Korean):*
+        *   LLM 기반 제조 AX 솔루션 개발 (지식그래프, Multi-Agent, RAG, 데이터 파이프라인, API 개발 등).
+        *   로봇 프로그래밍 개발 (ROS2, Isaac Sim, Sim2Real, 로봇 훈련 파이프라인, 관제 시스템).
+        *   제조AX SI 프로그래밍 및 PM (시스템 설계, 프로젝트 리딩, 고객사 PoC).
+        *   경영지원 (총무, 인사, 구매, 자산관리, 채용, 급여, 비용 관리).
+    *   *Keywords:* AI, Robotics, Manufacturing AX, GenAI, LLM, ROS2, Sim2Real, Physical AI, RAG, LLMOps, MLOps, PLC, MES, ERP.
+    *   *Seniority:* The description mentions "Team Leader level", "Manager level (과장급)", "Assistant Manager level (대리급)". This covers a range from Mid to Senior. Since it's a mix, "mid|senior" or "unknown" might apply, but looking at the specific roles, it's mostly mid-to-senior. I'll categorize based on the most prominent or use "unknown" if it's too broad, but "mid" or "senior" is more descriptive. Let's look at the specific roles: Team Leader (Senior), Manager (Mid/Senior), Assistant Manager (Mid). I will use "mid" or "senior" or "unknown". Given the variety, "unknown" is safest, but "mid" is a reasonable aggregate for a startup hiring these levels. Actually, the prompt asks for one of (junior|mid|senior|unknown). I'll go with "unknown" or "mid" because it's a multi-role posting. Let's check if I can provide an array? No, schema says `seniority (junior|mid|senior|unknown)`. I'll select "mid" as a representative or "unknown". Let's go with "unknown" because it's a batch recruitment.
+    *   *ATS Keywords:* AI, Robotics, Python, LLM, RAG, ROS2, Isaac Sim, PLC, MES, ERP, MLOps, LLMOps, Docker, Git, FastAPI.
+    *   *Risk Factors (Korean):* 불확실한 업무 환경 (스타트업), 정의되지 않은 문제 해결 필요, 다양한 직군 동시 채용으로 인한 역할 모호성 가능성, 초기 단계 스타트업의 변동성.
+
+    *   `roleTitle`: "핵심 엔지니어, 제조AX PM, 로봇 프로그래밍 개발자, 경영지원팀"
+    *   `companyType`: "startup"
+    *   `requiredSkills`: ["Python", "AI/SW/Robotics 기본기", "Git", "FastAPI", "Flask", "asyncio", "Docker", "Linux", "C++", "Java", "JavaScript"]
+    *   `preferredSkills`: ["ROS2", "Isaac Sim", "Unity", "LLM", "RAG", "Prompt/Tool Calling", "PLC", "SCADA", "OPC-UA", "HRI", "Vector DB", "FAISS", "Chroma", "Pinecone", "API 설계", "WebSocket", "Function Calling", "MLOps", "LLMOps"]
+    *   `responsibilities`: ["LLM 기반 제조 AX 솔루션 개발 및 데이터 파이프라인 구축", "로봇 작업 모델링 및 Sim2Real 전이 실험", "제조 AX 시스템 설계 및 프로젝트 PM 리딩", "경영지원 전반(인사, 총무, 구매, 자산관리) 운영"]
+    *   `keywords`: ["AI", "Robotics", "Manufacturing AX", "GenAI", "LLM", "ROS2", "Sim2Real", "Physical AI", "RAG", "LLMOps", "MLOps", "PLC", "MES", "ERP"]
+    *   `seniority`: "unknown" (since it covers Team Leader, Manager, and Assistant Manager)
+    *   `atsKeywords`: ["AI", "Robotics", "Python", "LLM", "RAG", "ROS2", "Isaac Sim", "PLC", "MES", "ERP", "MLOps", "LLMOps", "Docker", "Git", "FastAPI"]
+    *   `riskFactors`: ["정의되지 않은 문제를 스스로 해결해야 하는 불확실성", "스타트업 특유의 빠른 변화와 높은 업무 강도 가능성", "다양한 직군을 동시에 채용함에 따른 초기 조직 세팅 부담"]
+
+    *   `roleTitle`: "핵심 엔지니어, 제조AX PM, 로봇 프로그래밍 개발자, 경영지원팀"
+    *   `companyType`: "startup"
+    *   `requiredSkills`: ["Python", "AI/SW/Robotics 기본기", "Git", "FastAPI", "Flask", "asyncio", "Docker", "Linux", "C++", "Java", "JavaScript"]
+    *   `preferredSkills`: ["ROS2", "Isaac Sim", "Unity", "LLM", "RAG", "Prompt/Tool Calling", "PLC", "SCADA", "OPC-UA", "HRI", "Vector DB", "FAISS", "Chroma", "Pinecone", "API 설계", "WebSocket", "Function Calling", "MLOps", "LLMOps"]
+    *   `responsibilities`: ["LLM 기반 제조 AX 솔루션 개발 및 데이터 파이프라인 구축", "로봇 작업 모델링 및 Sim2Real 전이 실험", "제조 AX 시스템 설계 및 프로젝트 PM 리딩", "경영지원 전반(인사, 총무, 구매, 자산관리) 운영"]
+    *   `keywords`: ["AI", "Robotics", "Manufacturing AX", "GenAI", "LLM", "ROS2", "Sim2Real", "Physical AI", "RAG", "LLMOps", "MLOps", "PLC", "MES", "ERP"]
+    *   `seniority`: "unknown"
+    *   `atsKeywords`: ["AI", "Robotics", "Python", "LLM", "RAG", "ROS2", "Isaac Sim", "PLC", "MES", "ERP", "MLOps", "LLMOps", "Docker", "Git", "FastAPI"]
+    *   `riskFactors`: ["정의되지 않은 문제를 스스로 해결해야 하는 불확실성", "스타트업 특유의 빠른 변화와 높은 업무 강도 가능성", "다양한 직군을 동시에 채용함에 따른 초기 조직 세팅 부담"]
+
+    *Self-Correction on Seniority:* The prompt asks for one of (junior|mid|senior|unknown). Since the roles are Team Leader (Senior), Manager (Mid/Senior), and Assistant Manager (Mid), "unknown" is the most accurate single value for the whole job description.
+
+    *Self-Correction on roleTitle:* The user wants a string. I will list the main roles.
+
+    *Check JSON validity:*
+    - All strings double-quoted.
+    - Arrays use `[]`.
+    - No trailing commas.
+    - No comments.
+
+    *Final Polish of Korean strings:*
+    - `roleTitle`: "핵심 엔지니어, 제조AX PM, 로봇 프로그래밍 개발자, 경영지원팀"
+    - `responsibilities`: ["LLM 기반 제조 AX 솔루션 개발 및 데이터 파이프라인 구축", "로봇 작업 모델링 및 Sim2Real 전이 실험", "제조 AX 시스템 설계 및 프로젝트 PM 리딩", "경영지원 전반(인사, 총무, 구매, 자산관리) 운영"]
+    - `riskFactors`: ["정의되지 않은 문제를 스스로 구조화하고 해결해야 하는 불확실성", "스타트업 환경에서의 빠른 변화와 주도적 업무 수행 필요", "다양한 직군 동시 채용에 따른 초기 조직 안정화 단계"]
+
+    *Final check of schema:*
+    - roleTitle (string, Korean) - OK
+    - companyType (startup|enterprise|agency|unknown) - OK
+    - requiredSkills (array of strings) - OK
+    - preferredSkills (array) - OK
+    - responsibilities (array, Korean) - OK
+    - keywords (array) - OK
+    - seniority (junior|mid|senior|unknown) - OK
+    - atsKeywords (array) - OK
+    - riskFactors (array, Korean) - OK
+
+    *Wait, the prompt says "Extract structured information... into JSON format". The job description contains multiple roles. I will treat the entire posting as one entity.*
+
+    *One more check on requiredSkills:*
+    - Python, AI/SW/Robotics basics, Git, FastAPI, Flask, asyncio, Docker, Linux, C++, Java, JavaScript.
+
+    *One more check on preferredSkills:*
+    - ROS2, Isaac Sim, Unity, LLM, RAG, Prompt/Tool Calling, PLC, SCADA, OPC-UA, HRI, Vector DB, FAISS, Chroma, Pinecone, API 설계, WebSocket, Function Calling, MLOps, LLMOps.
+
+    *One more check on keywords:*
+    - AI, Robotics, Manufacturing AX, GenAI, LLM, ROS2, Sim2Real, Physical AI, RAG, LLMOps, MLOps, PLC, MES, ERP.
+
+    *One more check on atsKeywords:*
+    - AI, Robotics, Python, LLM, RAG, ROS2, Isaac Sim, PLC, MES, ERP, MLOps, LLMOps, Docker, Git, FastAPI.
+
+    *One more check on riskFactors:*
+    - "정의되지 않은 문제를 스스로 구조화하고 해결해야 하는 불확실성", "스타트업 환경에서의 빠른 변화와 주도적 업무 수행 필요", "다양한 직군 동시 채용에 따른 초기 조직 안정화 단계"
+
+    *Final JSON structure construction.*</thought>{
+  "roleTitle": "핵심 엔지니어, 제조AX PM, 로봇 프로그래밍 개발자, 경영지원팀",
+  "companyType": "startup",
+  "requiredSkills": [
+    "Python",
+    "AI/SW/Robotics 기본기",
+    "Git",
+    "FastAPI",
+    "Flask",
+    "asyncio",
+    "Docker",
+    "Linux",
+    "C++",
+    "Java",
+    "JavaScript"
+  ],
+  "preferredSkills": [
+    "ROS2",
+    "Isaac Sim",
+    "Unity",
+    "LLM",
+    "RAG",
+    "Prompt/Tool Calling",
+    "PLC",
+    "SCADA",
+    "OPC-UA",
+    "HRI",
+    "Vector DB",
+    "FAISS",
+    "Chroma",
+    "Pinecone",
+    "API 설계",
+    "WebSocket",
+    "Function Calling",
+    "MLOps",
+    "LLMOps"
+  ],
+  "responsibilities": [
+    "LLM 기반 제조 AX 솔루션 개발 및 데이터 파이프라인 구축",
+    "로봇 작업 모델링 및 Sim2Real 전이 실험/훈련 파이프라인 구축",
+    "제조 AX 시스템 설계 및 프로젝트 PM 리딩",
+    "경영지원 전반(인사, 총무, 구매, 자산관리) 운영 및 고도화"
+  ],
+  "keywords": [
+    "AI",
+    "Robotics",
+    "Manufacturing AX",
+    "GenAI",
+    "LLM",
+    "ROS2",
+    "Sim2Real",
+    "Physical AI",
+    "RAG",
+    "LLMOps",
+    "MLOps",
+    "PLC",
+    "MES",
+    "ERP"
+  ],
+  "seniority": "unknown",
+  "atsKeywords": [
+    "AI",
+    "Robotics",
+    "Python",
+    "LLM",
+    "RAG",
+    "ROS2",
+    "Isaac Sim",
+    "PLC",
+    "MES",
+    "ERP",
+    "MLOps",
+    "LLMOps",
+    "Docker",
+    "Git",
+    "FastAPI"
+  ],
+  "riskFactors": [
+    "정의되지 않은 문제를 스스로 구조화하고 해결해야 하는 불확실성",
+    "스타트업 환경에서의 빠른 변화와 주도적 업무 수행 필요",
+    "다양한 직군 동시 채용에 따른 초기 조직 안정화 단계의 변동성"
+  ]
+}
