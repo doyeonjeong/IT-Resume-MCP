@@ -8,11 +8,13 @@ import {
   McpError,
 } from '@modelcontextprotocol/sdk/types.js';
 import { NestFactory } from '@nestjs/core';
+import type { ConfigType } from '@nestjs/config';
 import { AppModule } from './app.module';
 import { ResumeService } from './resume/resume.service';
 import { ProfileService } from './profile/profile.service';
 import { UpdateProfileDto } from './profile/dto/update-profile.dto';
 import { createLocalLlmClient } from './llm/local-llm.factory';
+import llmConfig from './config/llm.config';
 import {
   ANALYZE_JD_SYSTEM_PROMPT,
   ANALYZE_JD_USER_PROMPT,
@@ -52,7 +54,8 @@ async function bootstrap() {
   const app = await NestFactory.createApplicationContext(AppModule);
   const resumeService = app.get(ResumeService);
   const profileService = app.get(ProfileService);
-  const localLlm = createLocalLlmClient();
+  const llmCfg = app.get<ConfigType<typeof llmConfig>>(llmConfig.KEY);
+  const localLlm = createLocalLlmClient(llmCfg);
 
   // Helper: build profile context string for local LLM prompts
   const buildProfileContext = async (): Promise<{
@@ -370,6 +373,7 @@ async function bootstrap() {
               },
             ],
             temperature: 0.3,
+            maxTokens: 2048,
           });
           const parsed = validateToolOutput(
             'analyze_jd',
@@ -402,6 +406,7 @@ async function bootstrap() {
               },
             ],
             temperature: 0.3,
+            maxTokens: 2048,
           });
           const parsed = validateToolOutput(
             'match_profile_to_jd',
@@ -436,6 +441,7 @@ async function bootstrap() {
               },
             ],
             temperature: 0.5,
+            maxTokens: 3072,
           });
           const parsed = validateToolOutput(
             'generate_resume_bullets',
@@ -469,6 +475,7 @@ async function bootstrap() {
               },
             ],
             temperature: 0.4,
+            maxTokens: 4096,
           });
           return {
             content: [{ type: 'text', text: result.content }],
