@@ -1,0 +1,21 @@
+{
+  "roleTitle": "백엔드 엔지니어",
+  "companyType": "Not specified",
+  "requiredSkills": [
+    "NestJS (3년 이상)"
+  ],
+  "preferredSkills": [
+    "TypeScript",
+    "결제 시스템 운영 경험"
+  ],
+  "responsibilities": [
+    "백엔드 시스템 개발 및 운영"
+  ],
+  "niceToHaves": [
+    "AWS",
+    "PostgreSQL"
+  ],
+  "location": "서울 강남",
+  "employmentType": "Not specified",
+  "languageHint": "Korean"
+}
