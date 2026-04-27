@@ -28,8 +28,10 @@ lerna-debug.log*
 public-resume-mcp/data/profile.json
 public-resume-mcp/documents/
 
-# Local agent state (oh-my-claudecode + Claude Code)
+# Local agent state (oh-my-claudecode + Claude Code + gstack)
 .omc/
 .claude/
+.gstack/
 public-resume-mcp/.omc/
 public-resume-mcp/.claude/
+public-resume-mcp/.gstack/
