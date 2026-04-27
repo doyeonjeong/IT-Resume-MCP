@@ -32,6 +32,7 @@ import {
   GENERATE_RESUME_MARKDOWN_USER_PROMPT,
 } from './llm/prompts/generate-resume.prompt';
 import { parseJsonFromLLM } from './utils/json-parser';
+import { sanitizeMarkdownOutput } from './utils/markdown-sanitizer';
 import type { JdAnalysis } from './domain/jd-analysis';
 import type { ProfileMatch, ResumeBullets } from './domain/resume';
 import {
@@ -306,12 +307,7 @@ async function bootstrap() {
             language: args.language ?? 'ko',
           });
           return {
-            content: [
-              {
-                type: 'text',
-                text: resume,
-              },
-            ],
+            content: [{ type: 'text', text: sanitizeMarkdownOutput(resume) }],
           };
         }
 
@@ -326,10 +322,7 @@ async function bootstrap() {
           });
           return {
             content: [
-              {
-                type: 'text',
-                text: portfolio,
-              },
+              { type: 'text', text: sanitizeMarkdownOutput(portfolio) },
             ],
           };
         }
@@ -348,10 +341,7 @@ async function bootstrap() {
           });
           return {
             content: [
-              {
-                type: 'text',
-                text: coverLetter,
-              },
+              { type: 'text', text: sanitizeMarkdownOutput(coverLetter) },
             ],
           };
         }
@@ -478,7 +468,9 @@ async function bootstrap() {
             maxTokens: 4096,
           });
           return {
-            content: [{ type: 'text', text: result.content }],
+            content: [
+              { type: 'text', text: sanitizeMarkdownOutput(result.content) },
+            ],
           };
         }
 

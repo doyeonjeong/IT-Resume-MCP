@@ -3,6 +3,21 @@
 All notable changes to this project will be documented here.
 This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semantic Versioning](https://semver.org/).
 
+## [0.1.1] - 2026-04-27
+
+### Fixed
+
+- `generate_resume_markdown`(및 `generate_resume`/`generate_portfolio`/`generate_cover_letter`) 출력에 LLM의 `<thought>`/`<thinking>`/`<reasoning>` reasoning 블록과 "Sure, here is..." 같은 prose prefix가 그대로 노출되던 문제. Gemma 4처럼 instruction-following이 약한 모델에서 사용자가 받는 결과가 망가지던 P0를 해소.
+
+### Added
+
+- `sanitizeMarkdownOutput` 유틸리티 (`src/utils/markdown-sanitizer.ts`): reasoning 메타 태그·prose prefix·외곽 code fence를 제거하고 `# header`부터 시작하는 깨끗한 markdown만 반환. 8개 단위 테스트로 Gemma-실세계 케이스 + edge case 검증.
+- `GENERATE_RESUME_MARKDOWN_SYSTEM_PROMPT` 강화: prose/reasoning/leading-phrase 금지를 명시적으로 추가. 약한 모델에 대한 instruction strength 보강.
+
+### Changed
+
+- README에 "사용법 시나리오 (Workflow Walkthrough)" 섹션 추가. 4가지 실제 사용 패턴(빠른 1회, 단계별 정밀 생성, 프로필 관리, 자기소개서)을 입력/출력 예시와 함께 설명. 단계별 실행 시간 표 포함.
+
 ## [0.1.0] - 2026-04-27
 
 ### Changed
