@@ -1,6 +1,6 @@
 # IT-Resume-MCP
 
-채용 공고(JD)를 입력하면 개인 프로필을 바탕으로 이력서, 포트폴리오 요약본, 자기소개서 초안을 생성하는 로컬 MCP 서버입니다. NestJS 위에 MCP 서버를 올리고, Cloud LLM fallback과 Ollama 기반 Local LLM 파이프라인을 함께 두는 구조입니다.
+채용 공고(JD)를 입력하면 개인 프로필을 바탕으로 이력서, 포트폴리오 요약본, 자기소개서 초안을 생성하는 로컬 MCP 서버입니다. NestJS 위에 MCP 서버를 올리고, Cloud LLM fallback과 OpenAI-compatible / Ollama 기반 Local LLM 파이프라인을 함께 두는 구조입니다.
 
 포트폴리오 관점에서는 "개인 프로필 JSON을 단일 소스로 관리하고, JD 분석 → 프로필 매칭 → 문서 생성으로 분리된 파이프라인을 MCP tool로 노출했다"는 점이 핵심입니다.
 
@@ -38,9 +38,9 @@
 - `get_profile`, `update_profile`로 개인 프로필 JSON 관리
 - `generate_resume`, `generate_portfolio`, `generate_cover_letter`로 Cloud LLM 기반 문서 생성
 - `analyze_jd`, `match_profile_to_jd`, `generate_resume_bullets`, `generate_resume_markdown`로 단계별 생성
-- 단계별 생성 backend로 `Ollama` 또는 `Hugging Face Router` 선택 가능
+- Local LLM provider는 두 가지: `ollama`(기본, 모든 플랫폼) 또는 `openai-compatible`(MLX, Hugging Face Router 등 어떤 OpenAI-호환 endpoint도 가능)
 - Claude / OpenAI / Gemini fallback
-- Ollama / Hugging Face 모델 교체 가능
+- 모델은 환경변수로 자유 교체
 
 ## 아키텍처
 
@@ -49,13 +49,13 @@ graph LR
   Client["Cursor / Claude Code"] --> MCP["mcp-server.ts"]
   MCP --> Profile["ProfileService"]
   MCP --> Resume["ResumeService"]
-  MCP --> Stepwise["Stepwise LLM Client"]
+  MCP --> Stepwise["Local LLM Client"]
   Resume --> Cloud["LlmService"]
   Cloud --> Claude["Claude"]
   Cloud --> OpenAI["OpenAI"]
   Cloud --> Gemini["Gemini"]
-  Stepwise --> Ollama["Ollama"]
-  Stepwise --> HF["Hugging Face Router"]
+  Stepwise --> Ollama["Ollama (default)"]
+  Stepwise --> OAC["OpenAI-compatible<br/>(MLX, HF Router, ...)"]
   Profile --> Data["data/profile.json"]
 ```
 
@@ -75,7 +75,7 @@ JD 입력
 | --- | --- |
 | Backend | NestJS 11, TypeScript |
 | Protocol | Model Context Protocol SDK |
-| Stepwise LLM | Ollama, Hugging Face Router |
+| Local LLM | Ollama (default), OpenAI-compatible endpoints (MLX, HF Router, ...) |
 | Cloud LLM | Claude, OpenAI, Gemini |
 | Validation | class-validator, Zod |
 | Test | Jest |
@@ -97,40 +97,80 @@ OPENAI_API_KEY=your-openai-api-key-here
 ANTHROPIC_API_KEY=your-anthropic-api-key-here
 GOOGLE_API_KEY=your-google-api-key-here
 
-OLLAMA_BASE_URL=http://localhost:11434
-OLLAMA_MODEL=gemma4:26b
+# Local LLM provider: ollama (default) | openai-compatible
 LOCAL_LLM_PROVIDER=ollama
-HF_TOKEN=your-huggingface-token-here
-HUGGINGFACE_BASE_URL=https://router.huggingface.co/v1
-HUGGINGFACE_MODEL=zai-org/GLM-5.1:preferred
+
+# Generic local LLM settings (factory applies provider-specific defaults if unset)
+# LOCAL_LLM_BASE_URL=http://localhost:11434
+# LOCAL_LLM_MODEL=gemma4:26b
+# LOCAL_LLM_API_KEY=
+
 LLM_TIMEOUT_MS=120000
 ```
 
-Ollama를 쓸 경우:
+### Local LLM 백엔드 1 — Ollama (기본, 권장)
+
+모든 OS에서 동작. 처음 시작이라면 이걸 쓰세요.
 
 ```bash
-brew install ollama
+brew install ollama          # macOS, 또는 https://ollama.com/download
 ollama pull gemma4:26b
 ollama serve
 ```
 
-Hugging Face Router를 쓸 경우:
+기본 설정으로 그대로 동작합니다. `.env`의 `LOCAL_LLM_PROVIDER=ollama`만 있으면 됩니다.
+다른 모델을 쓰고 싶다면:
 
 ```env
-LOCAL_LLM_PROVIDER=huggingface
-HF_TOKEN=your-huggingface-token-here
-HUGGINGFACE_MODEL=zai-org/GLM-5.1:preferred
+LOCAL_LLM_PROVIDER=ollama
+LOCAL_LLM_BASE_URL=http://localhost:11434
+LOCAL_LLM_MODEL=qwen2.5:14b
 ```
 
-권장 시작 모델:
+### Local LLM 백엔드 2 — OpenAI-compatible endpoint
 
-- `zai-org/GLM-5.1:preferred`
-- `deepseek-ai/DeepSeek-R1:preferred`
+OpenAI Chat Completions API와 호환되는 어떤 endpoint든 붙입니다 (MLX server, Hugging Face Router, vLLM, LM Studio, …).
 
-주의:
+`.env`:
 
-- `google/gemma-4-*`와 `deepseek-ai/DeepSeek-V3.2`는 모델 자체는 우수하지만, 실제 Hugging Face Router 가용성은 별도 확인이 필요합니다.
-- 이 저장소의 Hugging Face 경로는 OpenAI-compatible endpoint 기준입니다.
+```env
+LOCAL_LLM_PROVIDER=openai-compatible
+LOCAL_LLM_BASE_URL=<endpoint /v1>
+LOCAL_LLM_MODEL=<model name>
+LOCAL_LLM_API_KEY=<token or placeholder>
+```
+
+#### Preset A — MLX on Apple Silicon
+
+빠르고 메모리 효율적. Apple Silicon 전용.
+
+```bash
+/opt/homebrew/bin/python3.12 -m venv .venv-mlx
+.venv-mlx/bin/pip install -U mlx-vlm
+.venv-mlx/bin/mlx_vlm.server --model mlx-community/gemma-4-26b-a4b-it-4bit --port 8080
+```
+
+`.env`:
+
+```env
+LOCAL_LLM_PROVIDER=openai-compatible
+LOCAL_LLM_BASE_URL=http://localhost:8080/v1
+LOCAL_LLM_MODEL=mlx-community/gemma-4-26b-a4b-it-4bit
+LOCAL_LLM_API_KEY=mlx
+```
+
+참고: `mlx_vlm.server`가 텍스트 모델도 OpenAI-compatible endpoint로 서빙합니다. 텍스트 전용 빌드를 원하면 `mlx-lm`/`mlx_lm.server`로 교체 가능 (env 변경만 필요).
+
+#### Preset B — Hugging Face Router
+
+```env
+LOCAL_LLM_PROVIDER=openai-compatible
+LOCAL_LLM_BASE_URL=https://router.huggingface.co/v1
+LOCAL_LLM_MODEL=zai-org/GLM-5.1:preferred
+LOCAL_LLM_API_KEY=hf_your-token-here
+```
+
+권장 시작 모델: `zai-org/GLM-5.1:preferred`, `deepseek-ai/DeepSeek-R1:preferred`. 모델 가용성은 Hugging Face Router 상태에 따라 변동.
 
 프로필 파일 생성:
 
@@ -167,8 +207,7 @@ npm run mcp
       "env": {
         "LLM_PROVIDER": "gemini",
         "GOOGLE_API_KEY": "your_api_key",
-        "OLLAMA_BASE_URL": "http://localhost:11434",
-        "OLLAMA_MODEL": "gemma4:26b",
+        "LOCAL_LLM_PROVIDER": "ollama",
         "LLM_TIMEOUT_MS": "120000"
       }
     }
@@ -242,12 +281,18 @@ npm run build
 
 - `PROFILE_INCOMPLETE`:
   `data/profile.json`에 예시값이 남아 있습니다. 이름, 프로젝트명, GitHub URL 등을 실제 값으로 바꿔야 합니다.
+- `INVALID_LOCAL_LLM_PROVIDER`:
+  `.env`의 `LOCAL_LLM_PROVIDER`가 `ollama` 또는 `openai-compatible`이 아닙니다. 오타를 확인하세요.
 - `OLLAMA_CONNECTION_FAILED`:
-  `ollama serve`가 떠 있는지 확인하고 `OLLAMA_BASE_URL` 값을 점검하세요.
-- `HUGGINGFACE_AUTH_MISSING` / `HUGGINGFACE_AUTH_FAILED`:
-  `HF_TOKEN` 또는 `HUGGINGFACE_API_KEY`가 없거나 권한이 부족합니다.
-- `HUGGINGFACE_MODEL_UNAVAILABLE`:
-  선택한 모델이 현재 Hugging Face Router에서 배포 중이 아닙니다. `:preferred` 또는 다른 모델로 바꿔 보세요.
+  `ollama serve`가 떠 있는지 확인하고 `LOCAL_LLM_BASE_URL`(또는 기본 `http://localhost:11434`)이 맞는지 점검하세요.
+- `LOCAL_LLM_CONNECTION_FAILED`:
+  OpenAI-compatible endpoint(예: `mlx_vlm.server`)가 떠 있는지, `LOCAL_LLM_BASE_URL`이 정확한지 확인하세요.
+- `LOCAL_LLM_AUTH_FAILED`:
+  `LOCAL_LLM_API_KEY`가 없거나 endpoint에서 거부됨. Hugging Face Router면 `hf_` 토큰의 권한 확인.
+- `LOCAL_LLM_MODEL_UNAVAILABLE`:
+  선택한 모델이 현재 endpoint에서 서빙되지 않습니다. 모델 이름 확인 또는 다른 모델로 교체.
+- `LOCAL_LLM_RATE_LIMITED`:
+  Hugging Face Router 등 외부 endpoint의 rate limit. 잠시 후 재시도하거나 모델/제공자 변경.
 - `No LLM API key found`:
   Cloud 생성 tool을 쓸 때는 `.env`에 `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `GOOGLE_API_KEY` 중 최소 하나가 필요합니다.
 
