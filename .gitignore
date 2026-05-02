@@ -1,0 +1,51 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+*.tsbuildinfo
+
+# Environment variables
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Local Python virtualenvs (MLX, vLLM, etc.)
+.venv-mlx/
+.venv/
+
+# Personal resume / profile data — NEVER commit (local-only by design)
+data/profile.json
+data/profile.json.bak.*
+documents/
+output/
+
+# Internal / generated docs (not meant for public)
+docs/
+
+# OS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# npm pack tarballs
+*.tgz
+
+# Local agent / IDE state
+.claude/
+.gstack/
+.omc/
+.agents/
+
+# Prisma generated (if used)
+/generated/prisma
