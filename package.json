@@ -1,6 +1,6 @@
 {
   "name": "@doyeonjeong/resume-mcp",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Local-only MCP server that turns a job description into a tailored resume from your private profile. Profile data stays on your machine.",
   "author": "doyeonjeong",
   "license": "MIT",
