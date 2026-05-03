@@ -133,20 +133,20 @@ export class LlmService {
     systemPrompt: string,
     userPrompt: string,
   ): Promise<string> {
-    return this.generateText(systemPrompt, userPrompt, 8192);
+    return this.generateText(systemPrompt, userPrompt, 4096);
   }
 
   async generatePortfolio(
     systemPrompt: string,
     userPrompt: string,
   ): Promise<string> {
-    return this.generateText(systemPrompt, userPrompt, 8192);
+    return this.generateText(systemPrompt, userPrompt, 3000);
   }
 
   async generateCoverLetter(
     systemPrompt: string,
     userPrompt: string,
   ): Promise<string> {
-    return this.generateText(systemPrompt, userPrompt, 8192);
+    return this.generateText(systemPrompt, userPrompt, 2000);
   }
 }
