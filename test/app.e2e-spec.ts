@@ -4,6 +4,8 @@ import request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from './../src/app.module';
 
+const { version } = require('../package.json');
+
 describe('HTTP API (e2e)', () => {
   let app: INestApplication<App>;
 
@@ -28,6 +30,7 @@ describe('HTTP API (e2e)', () => {
         expect(body).toEqual(
           expect.objectContaining({
             name: 'resume-mcp',
+            version,
             status: 'ok',
             transport: expect.arrayContaining(['mcp-stdio', 'http']),
             tools: expect.arrayContaining([

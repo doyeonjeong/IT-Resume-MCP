@@ -1,0 +1,5 @@
+# .autopilot/project.yaml — resume-mcp (autopilot 3층 설정의 프로젝트층)
+# defaults.yaml < machine.<hostname>.yaml < 이 파일 순으로 덮어씀. 토큰 금지.
+
+limits:
+  build_cap_min: 15        # NestJS 소형 프로젝트 — npm ci+build 15분이면 충분

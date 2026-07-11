@@ -1,11 +1,14 @@
 import { Controller, Get } from '@nestjs/common';
 
+const { version } = require('../package.json');
+
 @Controller()
 export class AppController {
   @Get()
   getHealth() {
     return {
       name: 'resume-mcp',
+      version,
       status: 'ok',
       transport: ['mcp-stdio', 'http'],
       tools: [

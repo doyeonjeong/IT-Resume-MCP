@@ -56,6 +56,8 @@ import {
   validateToolOutput,
 } from './mcp/mcp-tool.schemas';
 
+const { version } = require('../package.json');
+
 async function bootstrap() {
   // MCP uses stdout as the JSON-RPC channel. Any stray text on stdout breaks
   // the protocol (clients see "invalid character '\x1b'" when colored logs
@@ -87,7 +89,7 @@ async function bootstrap() {
   const server = new Server(
     {
       name: 'resume-mcp',
-      version: '1.0.0',
+      version,
     },
     {
       capabilities: {
